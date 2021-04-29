@@ -1,4 +1,4 @@
-generate-protobuf-classes: output-dir
+regenerate-protobuf-classes: output-dir
 	protoc \
 		--proto_path=proto \
 		--go_out=pb \

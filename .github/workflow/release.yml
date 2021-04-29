@@ -1,0 +1,60 @@
+name: Release protobufs
+
+on:
+  push:
+    tags: v[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout go-sdk
+      uses: actions/checkout@v2
+      with:
+        repository: mbtamuli/protobuf-demo-go-sdk
+        token: ${{ secrets.BOT_TOKEN }}
+        path: go-sdk
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Install dependencies
+      run: |
+        PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-x86_64.zip
+        curl -sOL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/$PROTOC_ZIP > /dev/null
+        sudo unzip -qq -o $PROTOC_ZIP -d /usr/local bin/protoc
+        sudo unzip -qq -o $PROTOC_ZIP -d /usr/local 'include/*'
+        rm -f $PROTOC_ZIP
+        go get -u github.com/golang/protobuf/protoc-gen-go
+        gh config set prompt disabled
+      env:
+        PROTOC_VERSION: 3.14.0
+
+    - name: Compile protobufs
+      run: |
+        cd go-sdk
+        make regenerate-protobuf-classes
+
+    - name: Create PR for go-sdk
+      run: |
+        cd go-sdk
+        git config user.name "techfreak-bot"
+        git config user.email "34467411+techfreak-bot@users.noreply.github.com"
+        TAG=${GITHUB_REF##*/}
+        BRANCH_NAME="protobuf-${TAG}-PR"
+        gh api repos/:owner/:repo/git/refs \
+        --raw-field ref=refs/heads/${BRANCH_NAME} \
+        --raw-field sha="$(git rev-parse --verify HEAD)"
+        git fetch origin
+        git checkout ${BRANCH_NAME}
+        git add 
+        git commit -m "Update acquia-protobufs to ${TAG}"
+        git push origin ${BRANCH_NAME}
+        gh pr create --title "Update protobufs to ${TAG}" --body "ATTENTION: Must keep Go SDK and PHP SDK tags in sync"
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
