@@ -65,7 +65,7 @@ jobs:
         --raw-field sha="$(git rev-parse --verify HEAD)"
         git fetch origin
         git checkout ${BRANCH_NAME}
-        git add 
+        git add .
         git commit -m "Update acquia-protobufs to ${TAG}"
         git push origin ${BRANCH_NAME}
         gh pr create --title "Update protobufs to ${TAG}" --body "ATTENTION: Must keep Go SDK and PHP SDK tags in sync"
