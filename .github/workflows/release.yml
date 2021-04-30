@@ -3,6 +3,12 @@ name: Release protobufs
 on:
   push:
     tags: v[0-9]+.[0-9]+.[0-9]+
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 jobs:
 
@@ -35,9 +41,14 @@ jobs:
       env:
         PROTOC_VERSION: 3.14.0
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+      with:
+        limit-access-to-actor: true
+
     - name: Compile protobufs
       run: |
-        cd go-sdk
         make regenerate-protobuf-classes
 
     - name: Create PR for go-sdk
