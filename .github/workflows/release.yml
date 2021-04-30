@@ -67,6 +67,7 @@ jobs:
         fi
         git fetch origin
         git checkout ${BRANCH_NAME}
+        mkdir -p pb
         mv $GITHUB_WORKSPACE/pb/* pb/
         git add .
         git commit -m "Update protobufs to ${TAG}"
