@@ -55,6 +55,7 @@ jobs:
 
     - name: Create PR for go-sdk
       run: |
+        set -x
         cd go-sdk
         git config user.name "techfreak-bot"
         git config user.email "34467411+techfreak-bot@users.noreply.github.com"
