@@ -50,8 +50,6 @@ jobs:
     - name: Compile protobufs
       run: |
         make regenerate-protobuf-classes
-        mkdir -p go-sdk/pb
-        mv pb/* go-sdk/pb/
 
     - name: Create PR for go-sdk
       run: |
@@ -69,6 +67,7 @@ jobs:
         fi
         git fetch origin
         git checkout ${BRANCH_NAME}
+        mv $GITHUB_WORKSPACE/pb/* pb/
         git add .
         git commit -m "Update protobufs to ${TAG}"
         git push origin ${BRANCH_NAME}
