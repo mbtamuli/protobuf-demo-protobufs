@@ -2,10 +2,14 @@ syntax = "proto3";
 
 package mbtamuli.com.sample;
 
-option go_package = "github.com/mbtamuli/protobuf-demo-go-sdk/pb";
+option go_package = "github.com/mbtamuli/protobuf-demo-protobufs/pb";
 
 message Person {
   string name = 1;
   int32 id = 2;
   string email = 3;
+  oneof avatar {
+    string image_url = 4;
+    bytes image_data = 5;
+  }
 }
