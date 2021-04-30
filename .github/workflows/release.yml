@@ -60,10 +60,13 @@ jobs:
         git config user.email "34467411+techfreak-bot@users.noreply.github.com"
         TAG=${GITHUB_REF##*/}
         BRANCH_NAME="protobuf-${TAG}-PR"
-        gh api repos/:owner/:repo/git/refs \
-        --raw-field ref=refs/heads/${BRANCH_NAME} \
-        --raw-field sha="$(git rev-parse --verify HEAD)"
-        git fetch origin
+        existed_in_remote=$(git ls-remote --heads origin ${BRANCH_NAME})
+        if [[ -z ${existed_in_remote} ]]; then
+          gh api repos/:owner/:repo/git/refs \
+          --raw-field ref=refs/heads/${BRANCH_NAME} \
+          --raw-field sha="$(git rev-parse --verify HEAD)"
+          git fetch origin
+        fi
         git checkout ${BRANCH_NAME}
         git add .
         git commit -m "Update acquia-protobufs to ${TAG}"
