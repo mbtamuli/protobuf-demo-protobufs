@@ -35,7 +35,7 @@ jobs:
         curl -sOL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/$PROTOC_ZIP > /dev/null
         unzip -qq $PROTOC_ZIP
         sudo mv bin/protoc /usr/local/bin/
-        rm -f $PROTOC_ZIP readme.txt include bin
+        rm -rf $PROTOC_ZIP readme.txt include bin
         go get -u github.com/golang/protobuf/protoc-gen-go
         gh config set prompt disabled
       env:
