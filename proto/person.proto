@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package mbtamuli.com.sample;
 
+import "google/protobuf/timestamp.proto";
 option go_package = "github.com/mbtamuli/protobuf-demo-protobufs/pb";
 
 message Person {
@@ -12,4 +13,5 @@ message Person {
     string image_url = 4;
     bytes image_data = 5;
   }
+  google.protobuf.Timestamp now = 6;
 }
