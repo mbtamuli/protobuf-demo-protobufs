@@ -25,7 +25,8 @@ function create_all_branches()
 
 create_all_branches
 
-git checkout -b ${TRAVIS_PULL_REQUEST_BRANCH}
+git remote set-url origin https://${GITHUB_OAUTH_TOKEN}@github.com/mbtamuli/protobuf-demo-protobufs.git
+git checkout ${TRAVIS_PULL_REQUEST_BRANCH}
 git status
 make regenerate-protobuf-classes
 git status
