@@ -1,0 +1,60 @@
+dist: bionic
+language: go
+
+branches:
+  # blocklist
+  except:
+    # Avoid double testing stories which are tested as PRs.
+    - /[a-zA-Z]+-\d+/
+  # safelist
+  only:
+    # Allow testing changes to travis configuration.
+    - /[a-zA-Z]+-\d+-travis-test/
+    - /v[0-9]+.[0-9]+.[0-9]+/
+    - master
+
+services:
+  - docker
+
+go:
+  - "1.15.x"
+
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/pkg/mod
+
+install:
+  - curl -L https://github.com/google/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip -o /tmp/protoc.zip
+  - unzip /tmp/protoc.zip -d "$HOME/protoc"
+  - ln -s "$HOME/protoc/bin/protoc" "$HOME/bin"
+  - go get -u github.com/golang/protobuf/protoc-gen-go
+
+env:
+  - PATH=$HOME/protoc/bin:$PATH
+
+script:
+  - make regenerate-protobuf-classes
+
+after_success:
+  - |
+    #!/bin/sh
+
+    BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ -n "$(git status --porcelain)" ]; then
+      COMMIT_SHA=$(git log -1 --pretty=%h | head -c7)
+      DIFF=$(git diff HEAD| sha256sum | head -c7)
+      VERSION=$BRANCH.$COMMIT_SHA.$DIFF
+    else
+      TAG_NAME=$(git describe --exact-match --tags HEAD  2>/dev/null)
+      IS_A_TAG=$?
+    
+      if [ $IS_A_TAG -eq 0 ]; then
+        VERSION=$TAG_NAME
+      else
+        COMMIT_SHA=$(git log -1 --pretty=%h | head -c7)
+        VERSION=$BRANCH.$COMMIT_SHA
+      fi
+    fi
+
+    VERSION_JSON="{\"version\": \"${VERSION}\"}"
