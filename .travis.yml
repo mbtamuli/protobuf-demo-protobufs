@@ -1,5 +1,6 @@
 dist: bionic
 language: go
+os: linux
 
 branches:
   # blocklist
@@ -34,27 +35,5 @@ env:
   - PATH=$HOME/protoc/bin:$PATH
 
 script:
-  - make regenerate-protobuf-classes
-
-after_success:
-  - |
-    #!/bin/sh
-
-    BRANCH=$(git rev-parse --abbrev-ref HEAD)
-    if [ -n "$(git status --porcelain)" ]; then
-      COMMIT_SHA=$(git log -1 --pretty=%h | head -c7)
-      DIFF=$(git diff HEAD| sha256sum | head -c7)
-      VERSION=$BRANCH.$COMMIT_SHA.$DIFF
-    else
-      TAG_NAME=$(git describe --exact-match --tags HEAD  2>/dev/null)
-      IS_A_TAG=$?
-    
-      if [ $IS_A_TAG -eq 0 ]; then
-        VERSION=$TAG_NAME
-      else
-        COMMIT_SHA=$(git log -1 --pretty=%h | head -c7)
-        VERSION=$BRANCH.$COMMIT_SHA
-      fi
-    fi
-
-    VERSION_JSON="{\"version\": \"${VERSION}\"}"
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo "Nothing running since this is not a PR"; fi
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./scripts/update-pr.sh; fi
