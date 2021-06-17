@@ -1,4 +1,4 @@
-module github.com/mbtamuli/protobuf-demo-protobufs
+module github.com/mbtamuli/protobuf-demo-protobufs/v2
 
 go 1.15
 
