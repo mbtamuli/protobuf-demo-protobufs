@@ -15,4 +15,5 @@ message Person {
   }
   google.protobuf.Timestamp now = 6;
   string newField = 7;
+  string anotherField = 8;
 }
